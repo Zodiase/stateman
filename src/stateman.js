@@ -56,6 +56,8 @@
 
   var stateMachines = {};
 
+  var emptyArray = [];
+
   /**
    * Creates a new StateManager.
    * @alias StateManClass
@@ -73,23 +75,17 @@
   };
 
   /**
-   * Executes the actions associated with the specified key, with the altering state.
+   * Executes the actions with the specified arguments.
    * @function
    * @static
-   * @param {Object.<String, Array.<Function>>} actionSet
-   * @param {String} key
+   * @param {Array.<Function>} actions
    * @param {Boolean} haltForFalse
    * @param {Array.<*>} actionArgs
+   * @returns {Boolean} `true` if all actions are performed. `false` otherwise.
    */
-  StateManClass.executeActions = function (actionSet, key, haltForFalse, actionArgs) {
-    if (typeof actionSet !== 'object') {
-      throw new TypeError('Expecting an object.');
-    }
-    // else
-
-    var actions = actionSet[key];
-    if (typeof actions === 'undefined') {
-      return true;
+  StateManClass.executeActions = function (actions, haltForFalse, actionArgs) {
+    if (!Array.isArray(actions)) {
+      throw new TypeError('Expecting an array.');
     }
     // else
 
@@ -113,29 +109,6 @@
   };
 
   /**
-   * Signals the monitors about the state change.
-   * @function
-   * @static
-   * @param {Array.<Function>} monitors
-   * @param {String} currState
-   * @param {String} prevState
-   */
-  StateManClass.signalMonitors = function (monitors, currState, prevState) {
-    for (var i = 0, n = monitors.length, monitor; i < n; i++) {
-      monitor = monitors[i];
-
-      // Safeguard for function call.
-      if (typeof monitor !== 'function') {
-        // Ignore non-functions. Although there shouldn't be one.
-        continue;
-      }
-      // else
-
-      monitor(currState, prevState);
-    }
-  };
-
-  /**
    * Returns the current state.
    * @function
    * @returns {String} The current state.
@@ -156,29 +129,43 @@
     }
     // else
 
-    newStateName = String(newStateName);
-    forceTrigger = Boolean(forceTrigger);
+    var nextState = String(newStateName);
 
     // Only trigger when state changes, unless force trigger is requested.
-    if (newStateName === this._currentState && !forceTrigger) {
+    if (nextState === this._currentState && !forceTrigger) {
       return true;
     }
     // else
 
-    var previousState = this._currentState;
+    // Activate lock so actions can't change state.
+    this._stateLock = true;
 
-    // Perform leaving actions.
-    if (StateManClass.executeActions(this._actionsAfterLeaving, previousState, newStateName) === false) {
+    var prevState = this._currentState;
+
+    // Try to leave current state (prevState).
+    if (StateManClass.executeActions(this._actionsBeforeLeave[prevState] || emptyArray, true, [nextState, prevState]) === false) {
       // If any of the actions returns false, the state transition will fail.
       return false;
     }
     // else
 
-    this._stateLock = true;
-    this._currentState = newStateName;
-    StateManClass.signalMonitors(this._stateMonitors, this._currentState, previousState);
+    // Try to enter new state (nextState).
+    if (StateManClass.executeActions(this._actionsBeforeEnter[nextState] || emptyArray, true, [nextState, prevState]) === false) {
+      // If any of the actions returns false, the state transition will fail.
+      return false;
+    }
+    // else
+
+    // State changed.
+    this._currentState = nextState;
+
+    // Deactivate lock.
     this._stateLock = false;
-    StateManClass.executeActions(this._actionsAfterEntering, this._currentState, previousState);
+
+    setTimeout(StateManClass.executeActions.bind(StateManClass, this._actionsAfterLeave[prevState] || emptyArray, false, [prevState, nextState]), 0);
+    setTimeout(StateManClass.executeActions.bind(StateManClass, this._actionsAfterEnter[nextState] || emptyArray, false, [prevState, nextState]), 0);
+
+    setTimeout(StateManClass.executeActions.bind(StateManClass, this._stateMonitors, false, [nextState, prevState]), 0);
 
     return true;
   };
@@ -192,33 +179,53 @@
     this._stateMonitors.push(monitor);
   };
 
+  var getActionRegister = function (actionSetName) {
+    var propName = '_actions' + String(actionSetName);
+    return function (stateName, action) {
+      if (typeof this[propName] === 'undefined') {
+        throw new TypeError('Invalid Action Set name.');
+      }
+      // else
+
+      if (typeof this[propName][stateName] === 'undefined') {
+        this[propName][stateName] = [];
+      }
+
+      this[propName][stateName].push(action);
+    };
+  };
+
   /**
-   * Registers a callback that will be called after entering the specified state.
+   * Registers a callback that will be called before leaving the specified state.
    * @function
    * @param {String} stateName
-   * @param {StateManClass~stateEnterCallback} action
+   * @param {StateManClass~stateBeforeLeaveCallback} action
    */
-  StateManClass.prototype.registerEnteringAction = function (stateName, action) {
-    if (typeof this._actionsAfterEntering[stateName] === 'undefined') {
-      this._actionsAfterEntering[stateName] = [];
-    }
+  StateManClass.prototype.registerActionBeforeLeavingState = getActionRegister('BeforeLeave');
 
-    this._actionsAfterEntering[stateName].push(action);
-  };
+  /**
+   * Registers a callback that will be called before entering the specified state.
+   * @function
+   * @param {String} stateName
+   * @param {StateManClass~stateBeforeEnterCallback} action
+   */
+  StateManClass.prototype.registerActionBeforeEnteringState = getActionRegister('BeforeEnter');
 
   /**
    * Registers a callback that will be called after leaving the specified state.
    * @function
    * @param {String} stateName
-   * @param {StateManClass~stateEnterCallback} action
+   * @param {StateManClass~stateAfterLeaveCallback} action
    */
-  StateManClass.prototype.registerLeavingAction = function (stateName, action) {
-    if (typeof this._actionsAfterLeaving[stateName] === 'undefined') {
-      this._actionsAfterLeaving[stateName] = [];
-    }
+  StateManClass.prototype.registerActionAfterLeavingState = getActionRegister('AfterLeave');
 
-    this._actionsAfterLeaving[stateName].push(action);
-  };
+  /**
+   * Registers a callback that will be called after entering the specified state.
+   * @function
+   * @param {String} stateName
+   * @param {StateManClass~stateAfterEnterCallback} action
+   */
+  StateManClass.prototype.registerActionAfterEnteringState = getActionRegister('AfterEnter');
 
   /**
    * Finds or creates a state manager with the specified name.
