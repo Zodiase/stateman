@@ -148,6 +148,8 @@
     // Try to leave current state (prevState).
     if (StateManClass.executeActions(this._actionsBeforeLeave[prevState] || emptyArray, true, [nextState, prevState]) === false) {
       // If any of the actions returns false, the state transition will fail.
+      // Deactivate lock.
+      this._stateLock = false;
       return false;
     }
     // else
@@ -155,6 +157,8 @@
     // Try to enter new state (nextState).
     if (StateManClass.executeActions(this._actionsBeforeEnter[nextState] || emptyArray, true, [nextState, prevState]) === false) {
       // If any of the actions returns false, the state transition will fail.
+      // Deactivate lock.
+      this._stateLock = false;
       return false;
     }
     // else
