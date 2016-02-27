@@ -34,7 +34,7 @@
     * [new StateManClass()](#new_StateManClass_new)
     * _instance_
         * [.getState()](#StateManClass+getState) ⇒ <code>String</code>
-        * [.setState()](#StateManClass+setState) ⇒ <code>Boolean</code>
+        * [.setState(newStateName, callback, forceTrigger)](#StateManClass+setState) ⇒ <code>Boolean</code>
         * [.registerMonitor(monitors)](#StateManClass+registerMonitor)
         * [.registerActionBeforeLeavingState(stateName, action)](#StateManClass+registerActionBeforeLeavingState)
         * [.registerActionBeforeEnteringState(stateName, action)](#StateManClass+registerActionBeforeEnteringState)
@@ -61,11 +61,18 @@ Returns the current state.
 **Kind**: instance method of <code>[StateManClass](#StateManClass)</code>  
 **Returns**: <code>String</code> - The current state.  
 <a name="StateManClass+setState"></a>
-### stateManClass.setState() ⇒ <code>Boolean</code>
+### stateManClass.setState(newStateName, callback, forceTrigger) ⇒ <code>Boolean</code>
 Sets the current state.State actions and monitors will be called if the new state is different from the current one, or `forceTrigger` is set.
 
 **Kind**: instance method of <code>[StateManClass](#StateManClass)</code>  
 **Returns**: <code>Boolean</code> - `true` if the change is effective, `false` otherwise.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| newStateName | <code>String</code> | The name of the new state. |
+| callback | <code>function</code> | Callback when done. |
+| forceTrigger | <code>Boolean</code> | `true` to trigger actions and monitors even when the state doesn't change. |
+
 <a name="StateManClass+registerMonitor"></a>
 ### stateManClass.registerMonitor(monitors)
 Registers a callback that will be called when the state changes.

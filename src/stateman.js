@@ -121,9 +121,12 @@
    * Sets the current state.
    * State actions and monitors will be called if the new state is different from the current one, or `forceTrigger` is set.
    * @function
+   * @param {String} newStateName The name of the new state.
+   * @param {Function} [callback=NOOP] Callback when done.
+   * @param {Boolean} [forceTrigger=false] `true` to trigger actions and monitors even when the state doesn't change.
    * @returns {Boolean} `true` if the change is effective, `false` otherwise.
    */
-  StateManClass.prototype.setState = function (newStateName, forceTrigger) {
+  StateManClass.prototype.setState = function (newStateName, callback, forceTrigger) {
     if (this._stateLock) {
       return false;
     }
@@ -166,6 +169,10 @@
     setTimeout(StateManClass.executeActions.bind(StateManClass, this._actionsAfterEnter[nextState] || emptyArray, false, [prevState, nextState]), 0);
 
     setTimeout(StateManClass.executeActions.bind(StateManClass, this._stateMonitors, false, [nextState, prevState]), 0);
+
+    if (typeof callback === 'function') {
+      setTimeout(callback.bind(this), 0);
+    }
 
     return true;
   };
