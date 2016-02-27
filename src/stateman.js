@@ -5,7 +5,7 @@
  * @module STATEMAN
 **/
 
-/* global exports */
+/* global module */
 
 /**
  * State change flow: (*Return false to stop)
@@ -50,7 +50,7 @@
  */
 
 // Use @alias to expose members inside IIFE.
-;(function (exports) {
+;(function () {
   // function wrapped inside
   "use strict";
 
@@ -246,10 +246,22 @@
     // Cache it.
     stateMachines[stateMachineName] = newStateMachine;
 
+    // Add detach method.
+    /**
+     * Removes the cached reference so it can be GCed.
+     * @memberof! StateManClass#
+     * @function detach
+     */
+    newStateMachine.detach = function (stateMachineName) {
+      delete stateMachines[stateMachineName];
+    }.bind(newStateMachine, stateMachineName);
+
     return newStateMachine;
   };
 
-  if (typeof exports === "object" && exports !== null) {
-    exports.STATEMAN = STATEMAN;
+  if (module) {
+    module.exports = STATEMAN;
+  } else {
+    window.STATEMAN = STATEMAN;
   }
-})(typeof exports === 'undefined' ? window : exports);
+})();
