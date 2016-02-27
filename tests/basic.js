@@ -290,6 +290,41 @@ testSet.addTest('Before enter action can stop state change', function () {
   }
   return (sman.getState() === currentStateName);
 });
+testSet.addTest('Successful state change sequence', function () {
+  var sman = STATEMAN('test');
+  sman.detach();
+  var currentStateName = sman.getState(),
+      nextStateName1 = currentStateName + '-',
+      nextStateName2 = currentStateName + '--';
+  sman.setState(nextStateName1);
+  if (sman.getState() !== nextStateName1) {
+    return false;
+  }
+  sman.setState(nextStateName2);
+  if (sman.getState() !== nextStateName2) {
+    return false;
+  }
+  return true;
+});
+testSet.addTest('Interrupted state change sequence', function () {
+  var sman = STATEMAN('test');
+  sman.detach();
+  var currentStateName = sman.getState(),
+      nextStateName1 = currentStateName + '-',
+      nextStateName2 = currentStateName + '--';
+  sman.registerActionBeforeLeavingState(currentStateName, function (nextState, currState) {
+    return false;
+  });
+  sman.setState(nextStateName1);
+  if (sman.getState() !== currentStateName) {
+    return false;
+  }
+  sman.setState(nextStateName2);
+  if (sman.getState() !== currentStateName) {
+    return false;
+  }
+  return true;
+});
 
 // Do not modify anything below.
 var testCount = testSet.runTests(function (passed, totalRun) {
