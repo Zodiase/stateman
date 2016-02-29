@@ -146,7 +146,10 @@ testSet.addAsyncTest('Action parameter - before leave', function (pass, fail) {
       nextStateName = prevStateName + '-',
       actionData = {};
   sman.registerActionBeforeLeavingState(prevStateName, function (nextState, currState, data) {
-    if (currState === prevStateName && nextState === nextStateName && data === actionData) {
+    if (this === sman &&
+        currState === prevStateName &&
+        nextState === nextStateName &&
+        data === actionData) {
       pass();
     } else {
       fail();
@@ -161,7 +164,10 @@ testSet.addAsyncTest('Action parameter - before enter', function (pass, fail) {
       nextStateName = prevStateName + '-',
       actionData = {};
   sman.registerActionBeforeEnteringState(nextStateName, function (nextState, currState, data) {
-    if (currState === prevStateName && nextState === nextStateName && data === actionData) {
+    if (this === sman &&
+        currState === prevStateName &&
+        nextState === nextStateName &&
+        data === actionData) {
       pass();
     } else {
       fail();
@@ -176,7 +182,10 @@ testSet.addAsyncTest('Action parameter - after leave', function (pass, fail) {
       nextStateName = prevStateName + '-',
       actionData = {};
   sman.registerActionAfterLeavingState(prevStateName, function (prevState, currState, data) {
-    if (currState === nextStateName && prevState === prevStateName && data === actionData) {
+    if (this === sman &&
+        currState === nextStateName &&
+        prevState === prevStateName &&
+        data === actionData) {
       pass();
     } else {
       fail();
@@ -191,7 +200,10 @@ testSet.addAsyncTest('Action parameter - after enter', function (pass, fail) {
       nextStateName = prevStateName + '-',
       actionData = {};
   sman.registerActionAfterEnteringState(nextStateName, function (prevState, currState, data) {
-    if (currState === nextStateName && prevState === prevStateName && data === actionData) {
+    if (this === sman &&
+        currState === nextStateName &&
+        prevState === prevStateName &&
+        data === actionData) {
       pass();
     } else {
       fail();
@@ -206,7 +218,10 @@ testSet.addAsyncTest('Action parameter - monitor', function (pass, fail) {
       nextStateName = prevStateName + '-',
       actionData = {};
   sman.registerMonitor(function (currState, prevState, data) {
-    if (currState === nextStateName && prevState === prevStateName && data === actionData) {
+    if (this === sman &&
+        currState === nextStateName &&
+        prevState === prevStateName &&
+        data === actionData) {
       pass();
     } else {
       fail();
