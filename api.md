@@ -34,7 +34,7 @@
     * [new StateManClass()](#new_StateManClass_new)
     * _instance_
         * [.getState()](#StateManClass+getState) ⇒ <code>String</code>
-        * [.setState(newStateName, [callback], [forceTrigger])](#StateManClass+setState) ⇒ <code>Boolean</code>
+        * [.setState(newStateName, data, [callback], [forceTrigger])](#StateManClass+setState) ⇒ <code>Boolean</code>
         * [.registerMonitor(monitors)](#StateManClass+registerMonitor)
         * [.registerActionBeforeLeavingState(stateName, action)](#StateManClass+registerActionBeforeLeavingState)
         * [.registerActionBeforeEnteringState(stateName, action)](#StateManClass+registerActionBeforeEnteringState)
@@ -61,7 +61,7 @@ Returns the current state.
 **Kind**: instance method of <code>[StateManClass](#StateManClass)</code>  
 **Returns**: <code>String</code> - The current state.  
 <a name="StateManClass+setState"></a>
-### stateManClass.setState(newStateName, [callback], [forceTrigger]) ⇒ <code>Boolean</code>
+### stateManClass.setState(newStateName, data, [callback], [forceTrigger]) ⇒ <code>Boolean</code>
 Sets the current state.State actions and monitors will be called if the new state is different from the current one, or `forceTrigger` is set.
 
 **Kind**: instance method of <code>[StateManClass](#StateManClass)</code>  
@@ -70,7 +70,8 @@ Sets the current state.State actions and monitors will be called if the new sta
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | newStateName | <code>String</code> |  | The name of the new state. |
-| [callback] | <code>function</code> | <code>NOOP</code> | Callback when done. |
+| data | <code>\*</code> |  | Extra data passed to all actions and monitors. |
+| [callback] | <code>function</code> | <code>NOOP</code> | Callback when state change is effective. |
 | [forceTrigger] | <code>Boolean</code> | <code>false</code> | `true` to trigger actions and monitors even when the state doesn't change. |
 
 <a name="StateManClass+registerMonitor"></a>
@@ -156,6 +157,7 @@ Callback to be executed before leaving a state.
 | --- | --- | --- |
 | nextState | <code>String</code> | The state leaving for. |
 | currState | <code>String</code> | The state leaving from. |
+| data | <code>\*</code> | The data passed from setState, if any. |
 
 <a name="StateManClass..stateBeforeEnterCallback"></a>
 ### StateManClass~stateBeforeEnterCallback ⇒ <code>Boolean</code>
@@ -168,6 +170,7 @@ Callback to be executed before entering a state.
 | --- | --- | --- |
 | nextState | <code>String</code> | The state entering. |
 | currState | <code>String</code> | The state entering from. |
+| data | <code>\*</code> | The data passed from setState, if any. |
 
 <a name="StateManClass..stateAfterLeaveCallback"></a>
 ### StateManClass~stateAfterLeaveCallback : <code>function</code>
@@ -179,6 +182,7 @@ Callback to be executed after leaving a state.
 | --- | --- | --- |
 | prevState | <code>String</code> | The state left from. |
 | currState | <code>String</code> | The state left for. |
+| data | <code>\*</code> | The data passed from setState, if any. |
 
 <a name="StateManClass..stateAfterEnterCallback"></a>
 ### StateManClass~stateAfterEnterCallback : <code>function</code>
@@ -190,6 +194,7 @@ Callback to be executed after entering a state.
 | --- | --- | --- |
 | prevState | <code>String</code> | The state entered from. |
 | currState | <code>String</code> | The state entered. |
+| data | <code>\*</code> | The data passed from setState, if any. |
 
 <a name="StateManClass..stateChangeCallback"></a>
 ### StateManClass~stateChangeCallback : <code>function</code>
@@ -201,6 +206,7 @@ Callback to be executed when a state change has occurred.
 | --- | --- | --- |
 | currState | <code>String</code> | The current state. |
 | prevState | <code>String</code> | The previous state. |
+| data | <code>\*</code> | The data passed from setState, if any. |
 
 <a name="STATEMAN"></a>
 ## STATEMAN(stateMachineName)

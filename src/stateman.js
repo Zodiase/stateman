@@ -17,6 +17,7 @@
  * @callback StateManClass~stateBeforeLeaveCallback
  * @param {String} nextState The state leaving for.
  * @param {String} currState The state leaving from.
+ * @param {*} data The data passed from setState, if any.
  * @returns {Boolean} `false` to prevent the change.
  */
 
@@ -25,6 +26,7 @@
  * @callback StateManClass~stateBeforeEnterCallback
  * @param {String} nextState The state entering.
  * @param {String} currState The state entering from.
+ * @param {*} data The data passed from setState, if any.
  * @returns {Boolean} `false` to prevent the change.
  */
 
@@ -33,6 +35,7 @@
  * @callback StateManClass~stateAfterLeaveCallback
  * @param {String} prevState The state left from.
  * @param {String} currState The state left for.
+ * @param {*} data The data passed from setState, if any.
  */
 
 /**
@@ -40,6 +43,7 @@
  * @callback StateManClass~stateAfterEnterCallback
  * @param {String} prevState The state entered from.
  * @param {String} currState The state entered.
+ * @param {*} data The data passed from setState, if any.
  */
 
 /**
@@ -47,6 +51,7 @@
  * @callback StateManClass~stateChangeCallback
  * @param {String} currState The current state.
  * @param {String} prevState The previous state.
+ * @param {*} data The data passed from setState, if any.
  */
 
 // Use @alias to expose members inside IIFE.
@@ -122,11 +127,12 @@
    * State actions and monitors will be called if the new state is different from the current one, or `forceTrigger` is set.
    * @function
    * @param {String} newStateName The name of the new state.
-   * @param {Function} [callback=NOOP] Callback when done.
+   * @param {*} data Extra data passed to all actions and monitors.
+   * @param {Function} [callback=NOOP] Callback when state change is effective.
    * @param {Boolean} [forceTrigger=false] `true` to trigger actions and monitors even when the state doesn't change.
    * @returns {Boolean} `true` if the change is effective, `false` otherwise.
    */
-  StateManClass.prototype.setState = function (newStateName, callback, forceTrigger) {
+  StateManClass.prototype.setState = function (newStateName, data, callback, forceTrigger) {
     if (this._stateLock) {
       return false;
     }
@@ -146,8 +152,8 @@
     var prevState = this._currentState;
 
     // Try to leave current state (prevState).
-    if (StateManClass.executeActions(this._actionsBeforeLeave[prevState] || emptyArray, true, [nextState, prevState]) === false) {
-      // If any of the actions returns false, the state transition will fail.
+    if (StateManClass.executeActions(this._actionsBeforeLeave[prevState] || emptyArray, true, [nextState, prevState, data]) === false) {
+      // If any of the actions returned false, the state transition fails.
       // Deactivate lock.
       this._stateLock = false;
       return false;
@@ -155,8 +161,8 @@
     // else
 
     // Try to enter new state (nextState).
-    if (StateManClass.executeActions(this._actionsBeforeEnter[nextState] || emptyArray, true, [nextState, prevState]) === false) {
-      // If any of the actions returns false, the state transition will fail.
+    if (StateManClass.executeActions(this._actionsBeforeEnter[nextState] || emptyArray, true, [nextState, prevState, data]) === false) {
+      // If any of the actions returned false, the state transition fails.
       // Deactivate lock.
       this._stateLock = false;
       return false;
@@ -169,13 +175,13 @@
     // Deactivate lock.
     this._stateLock = false;
 
-    setTimeout(StateManClass.executeActions.bind(StateManClass, this._actionsAfterLeave[prevState] || emptyArray, false, [prevState, nextState]), 0);
-    setTimeout(StateManClass.executeActions.bind(StateManClass, this._actionsAfterEnter[nextState] || emptyArray, false, [prevState, nextState]), 0);
+    setTimeout(StateManClass.executeActions.bind(StateManClass, this._actionsAfterLeave[prevState] || emptyArray, false, [prevState, nextState, data]), 0);
+    setTimeout(StateManClass.executeActions.bind(StateManClass, this._actionsAfterEnter[nextState] || emptyArray, false, [prevState, nextState, data]), 0);
 
-    setTimeout(StateManClass.executeActions.bind(StateManClass, this._stateMonitors, false, [nextState, prevState]), 0);
+    setTimeout(StateManClass.executeActions.bind(StateManClass, this._stateMonitors, false, [nextState, prevState, data]), 0);
 
     if (typeof callback === 'function') {
-      setTimeout(callback.bind(this), 0);
+      setTimeout(callback.bind(this, data), 0);
     }
 
     return true;
