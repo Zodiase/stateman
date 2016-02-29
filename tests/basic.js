@@ -46,10 +46,10 @@ testSet.addTest('Default state is `None`', function () {
 testSet.addTest('Can switch states', function () {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      stateName = currentStateName + '-';
-  sman.setState(stateName);
-  if (sman.getState() !== stateName) {
+  var prevStateName = sman.getState(),
+      nextStateName = prevStateName + '-';
+  sman.setState(nextStateName);
+  if (sman.getState() !== nextStateName) {
     return false;
   }
   return true;
@@ -57,13 +57,13 @@ testSet.addTest('Can switch states', function () {
 testSet.addAsyncTest('Can register action - before leave', function (pass, fail) {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      stateName = currentStateName + '-',
+  var prevStateName = sman.getState(),
+      nextStateName = prevStateName + '-',
       isTriggered = false;
-  sman.registerActionBeforeLeavingState(currentStateName, function (nextState, currState, data) {
+  sman.registerActionBeforeLeavingState(prevStateName, function (nextState, currState, data) {
     isTriggered = true;
   });
-  sman.setState(stateName, null, function () {
+  sman.setState(nextStateName, null, function () {
     if (isTriggered === true) {
       pass();
     } else {
@@ -74,13 +74,13 @@ testSet.addAsyncTest('Can register action - before leave', function (pass, fail)
 testSet.addAsyncTest('Can register action - before enter', function (pass, fail) {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      stateName = currentStateName + '-',
+  var prevStateName = sman.getState(),
+      nextStateName = prevStateName + '-',
       isTriggered = false;
-  sman.registerActionBeforeEnteringState(stateName, function (nextState, currState, data) {
+  sman.registerActionBeforeEnteringState(nextStateName, function (nextState, currState, data) {
     isTriggered = true;
   });
-  sman.setState(stateName, null, function () {
+  sman.setState(nextStateName, null, function () {
     if (isTriggered === true) {
       pass();
     } else {
@@ -91,13 +91,13 @@ testSet.addAsyncTest('Can register action - before enter', function (pass, fail)
 testSet.addAsyncTest('Can register action - after leave', function (pass, fail) {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      stateName = currentStateName + '-',
+  var prevStateName = sman.getState(),
+      nextStateName = prevStateName + '-',
       isTriggered = false;
-  sman.registerActionAfterLeavingState(currentStateName, function (prevState, currState, data) {
+  sman.registerActionAfterLeavingState(prevStateName, function (prevState, currState, data) {
     isTriggered = true;
   });
-  sman.setState(stateName, null, function () {
+  sman.setState(nextStateName, null, function () {
     if (isTriggered === true) {
       pass();
     } else {
@@ -108,13 +108,13 @@ testSet.addAsyncTest('Can register action - after leave', function (pass, fail) 
 testSet.addAsyncTest('Can register action - after enter', function (pass, fail) {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      stateName = currentStateName + '-',
+  var prevStateName = sman.getState(),
+      nextStateName = prevStateName + '-',
       isTriggered = false;
-  sman.registerActionAfterEnteringState(stateName, function (prevState, currState, data) {
+  sman.registerActionAfterEnteringState(nextStateName, function (prevState, currState, data) {
     isTriggered = true;
   });
-  sman.setState(stateName, null, function () {
+  sman.setState(nextStateName, null, function () {
     if (isTriggered === true) {
       pass();
     } else {
@@ -125,13 +125,13 @@ testSet.addAsyncTest('Can register action - after enter', function (pass, fail) 
 testSet.addAsyncTest('Can register action - monitor', function (pass, fail) {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      stateName = currentStateName + '-',
+  var prevStateName = sman.getState(),
+      nextStateName = prevStateName + '-',
       isTriggered = false;
   sman.registerMonitor(function (currState, prevState, data) {
     isTriggered = true;
   });
-  sman.setState(stateName, null, function () {
+  sman.setState(nextStateName, null, function () {
     if (isTriggered === true) {
       pass();
     } else {
@@ -142,83 +142,83 @@ testSet.addAsyncTest('Can register action - monitor', function (pass, fail) {
 testSet.addAsyncTest('Action parameter - before leave', function (pass, fail) {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      stateName = currentStateName + '-',
+  var prevStateName = sman.getState(),
+      nextStateName = prevStateName + '-',
       actionData = {};
-  sman.registerActionBeforeLeavingState(currentStateName, function (nextState, currState, data) {
-    if (currState === currentStateName && nextState === stateName && data === actionData) {
+  sman.registerActionBeforeLeavingState(prevStateName, function (nextState, currState, data) {
+    if (currState === prevStateName && nextState === nextStateName && data === actionData) {
       pass();
     } else {
       fail();
     }
   });
-  sman.setState(stateName, actionData);
+  sman.setState(nextStateName, actionData);
 });
 testSet.addAsyncTest('Action parameter - before enter', function (pass, fail) {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      stateName = currentStateName + '-',
+  var prevStateName = sman.getState(),
+      nextStateName = prevStateName + '-',
       actionData = {};
-  sman.registerActionBeforeEnteringState(stateName, function (nextState, currState, data) {
-    if (currState === currentStateName && nextState === stateName && data === actionData) {
+  sman.registerActionBeforeEnteringState(nextStateName, function (nextState, currState, data) {
+    if (currState === prevStateName && nextState === nextStateName && data === actionData) {
       pass();
     } else {
       fail();
     }
   });
-  sman.setState(stateName, actionData);
+  sman.setState(nextStateName, actionData);
 });
 testSet.addAsyncTest('Action parameter - after leave', function (pass, fail) {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      stateName = currentStateName + '-',
+  var prevStateName = sman.getState(),
+      nextStateName = prevStateName + '-',
       actionData = {};
-  sman.registerActionAfterLeavingState(currentStateName, function (prevState, currState, data) {
-    if (currState === stateName && prevState === currentStateName && data === actionData) {
+  sman.registerActionAfterLeavingState(prevStateName, function (prevState, currState, data) {
+    if (currState === nextStateName && prevState === prevStateName && data === actionData) {
       pass();
     } else {
       fail();
     }
   });
-  sman.setState(stateName, actionData);
+  sman.setState(nextStateName, actionData);
 });
 testSet.addAsyncTest('Action parameter - after enter', function (pass, fail) {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      stateName = currentStateName + '-',
+  var prevStateName = sman.getState(),
+      nextStateName = prevStateName + '-',
       actionData = {};
-  sman.registerActionAfterEnteringState(stateName, function (prevState, currState, data) {
-    if (currState === stateName && prevState === currentStateName && data === actionData) {
+  sman.registerActionAfterEnteringState(nextStateName, function (prevState, currState, data) {
+    if (currState === nextStateName && prevState === prevStateName && data === actionData) {
       pass();
     } else {
       fail();
     }
   });
-  sman.setState(stateName, actionData);
+  sman.setState(nextStateName, actionData);
 });
 testSet.addAsyncTest('Action parameter - monitor', function (pass, fail) {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      stateName = currentStateName + '-',
+  var prevStateName = sman.getState(),
+      nextStateName = prevStateName + '-',
       actionData = {};
   sman.registerMonitor(function (currState, prevState, data) {
-    if (currState === stateName && prevState === currentStateName && data === actionData) {
+    if (currState === nextStateName && prevState === prevStateName && data === actionData) {
       pass();
     } else {
       fail();
     }
   });
-  sman.setState(stateName, actionData);
+  sman.setState(nextStateName, actionData);
 });
 testSet.addAsyncTest('Action order', function (pass, fail) {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      stateName = currentStateName + '-',
+  var prevStateName = sman.getState(),
+      nextStateName = prevStateName + '-',
       startValue = 0,
       operations = [
         function (input) {
@@ -242,22 +242,22 @@ testSet.addAsyncTest('Action order', function (pass, fail) {
   operations.forEach(function (op, index) {
     expectedResult = op(expectedResult);
   });
-  sman.registerActionBeforeLeavingState(currentStateName, function (nextState, currState, data) {
+  sman.registerActionBeforeLeavingState(prevStateName, function (nextState, currState, data) {
     testResult = operations[0](testResult);
   });
-  sman.registerActionBeforeEnteringState(stateName, function (nextState, currState, data) {
+  sman.registerActionBeforeEnteringState(nextStateName, function (nextState, currState, data) {
     testResult = operations[1](testResult);
   });
-  sman.registerActionAfterLeavingState(currentStateName, function (prevState, currState, data) {
+  sman.registerActionAfterLeavingState(prevStateName, function (prevState, currState, data) {
     testResult = operations[2](testResult);
   });
-  sman.registerActionAfterEnteringState(stateName, function (prevState, currState, data) {
+  sman.registerActionAfterEnteringState(nextStateName, function (prevState, currState, data) {
     testResult = operations[3](testResult);
   });
   sman.registerMonitor(function (currState, prevState, data) {
     testResult = operations[4](testResult);
   });
-  sman.setState(stateName, null, function () {
+  sman.setState(nextStateName, null, function () {
     if (testResult === expectedResult) {
       pass();
     } else {
@@ -268,39 +268,39 @@ testSet.addAsyncTest('Action order', function (pass, fail) {
 testSet.addTest('Before leave action can stop state change', function () {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      stateName = currentStateName + '-';
-  sman.registerActionBeforeLeavingState(currentStateName, function (nextState, currState, data) {
+  var prevStateName = sman.getState(),
+      nextStateName = prevStateName + '-';
+  sman.registerActionBeforeLeavingState(prevStateName, function (nextState, currState, data) {
     return false;
   });
-  var changeResult = sman.setState(stateName);
+  var changeResult = sman.setState(nextStateName);
   // changeResult should be false, indicating the change is not effective.
   if (changeResult === true) {
     return false;
   }
-  return (sman.getState() === currentStateName);
+  return (sman.getState() === prevStateName);
 });
 testSet.addTest('Before enter action can stop state change', function () {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      stateName = currentStateName + '-';
-  sman.registerActionBeforeEnteringState(stateName, function (nextState, currState, data) {
+  var prevStateName = sman.getState(),
+      nextStateName = prevStateName + '-';
+  sman.registerActionBeforeEnteringState(nextStateName, function (nextState, currState, data) {
     return false;
   });
-  var changeResult = sman.setState(stateName);
+  var changeResult = sman.setState(nextStateName);
   // changeResult should be false, indicating the change is not effective.
   if (changeResult === true) {
     return false;
   }
-  return (sman.getState() === currentStateName);
+  return (sman.getState() === prevStateName);
 });
 testSet.addTest('Successful state change sequence', function () {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      nextStateName1 = currentStateName + '-',
-      nextStateName2 = currentStateName + '--';
+  var prevStateName = sman.getState(),
+      nextStateName1 = prevStateName + '-',
+      nextStateName2 = prevStateName + '--';
   sman.setState(nextStateName1);
   if (sman.getState() !== nextStateName1) {
     return false;
@@ -314,18 +314,18 @@ testSet.addTest('Successful state change sequence', function () {
 testSet.addTest('Interrupted state change sequence', function () {
   var sman = STATEMAN('test');
   sman.detach();
-  var currentStateName = sman.getState(),
-      nextStateName1 = currentStateName + '-',
-      nextStateName2 = currentStateName + '--';
-  sman.registerActionBeforeLeavingState(currentStateName, function (nextState, currState, data) {
+  var prevStateName = sman.getState(),
+      nextStateName1 = prevStateName + '-',
+      nextStateName2 = prevStateName + '--';
+  sman.registerActionBeforeLeavingState(prevStateName, function (nextState, currState, data) {
     return false;
   });
   sman.setState(nextStateName1);
-  if (sman.getState() !== currentStateName) {
+  if (sman.getState() !== prevStateName) {
     return false;
   }
   sman.setState(nextStateName2);
-  if (sman.getState() !== currentStateName) {
+  if (sman.getState() !== prevStateName) {
     return false;
   }
   return true;
