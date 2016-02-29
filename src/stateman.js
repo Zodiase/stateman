@@ -152,7 +152,12 @@
     var prevState = this._currentState;
 
     // Try to leave current state (prevState).
-    if (StateManClass.executeActions.call(this, this._actionsBeforeLeave[prevState] || emptyArray, true, [nextState, prevState, data]) === false) {
+    if (StateManClass.executeActions.call(
+          this,
+          this._actionsBeforeLeave[prevState] || emptyArray,
+          true,
+          [nextState, prevState, data]
+        ) === false) {
       // If any of the actions returned false, the state transition fails.
       // Deactivate lock.
       this._stateLock = false;
@@ -161,7 +166,12 @@
     // else
 
     // Try to enter new state (nextState).
-    if (StateManClass.executeActions.call(this, this._actionsBeforeEnter[nextState] || emptyArray, true, [nextState, prevState, data]) === false) {
+    if (StateManClass.executeActions.call(
+          this,
+          this._actionsBeforeEnter[nextState] || emptyArray,
+          true,
+          [nextState, prevState, data]
+        ) === false) {
       // If any of the actions returned false, the state transition fails.
       // Deactivate lock.
       this._stateLock = false;
@@ -175,10 +185,25 @@
     // Deactivate lock.
     this._stateLock = false;
 
-    setTimeout(StateManClass.executeActions.bind(this, this._actionsAfterLeave[prevState] || emptyArray, false, [prevState, nextState, data]), 0);
-    setTimeout(StateManClass.executeActions.bind(this, this._actionsAfterEnter[nextState] || emptyArray, false, [prevState, nextState, data]), 0);
+    setTimeout(StateManClass.executeActions.bind(
+                 this,
+                 this._actionsAfterLeave[prevState] || emptyArray,
+                 false,
+                 [prevState, nextState, data]
+               ), 0);
+    setTimeout(StateManClass.executeActions.bind(
+                 this,
+                 this._actionsAfterEnter[nextState] || emptyArray,
+                 false,
+                 [prevState, nextState, data]
+               ), 0);
 
-    setTimeout(StateManClass.executeActions.bind(this, this._stateMonitors, false, [nextState, prevState, data]), 0);
+    setTimeout(StateManClass.executeActions.bind(
+                 this,
+                 this._stateMonitors,
+                 false,
+                 [nextState, prevState, data]
+               ), 0);
 
     if (typeof callback === 'function') {
       setTimeout(callback.bind(this, data), 0);
