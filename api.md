@@ -41,8 +41,6 @@
         * [.registerActionAfterLeavingState(stateName, action)](#StateManClass+registerActionAfterLeavingState)
         * [.registerActionAfterEnteringState(stateName, action)](#StateManClass+registerActionAfterEnteringState)
         * [.#detach()](#StateManClass+detach)
-    * _static_
-        * [.executeActions(actions, haltForFalse, actionArgs)](#StateManClass.executeActions) ⇒ <code>Boolean</code>
     * _inner_
         * [~stateBeforeLeaveCallback](#StateManClass..stateBeforeLeaveCallback) ⇒ <code>Boolean</code>
         * [~stateBeforeEnterCallback](#StateManClass..stateBeforeEnterCallback) ⇒ <code>Boolean</code>
@@ -133,19 +131,6 @@ Registers a callback that will be called after entering the specified state.
 Removes the cached reference so it can be GCed.
 
 **Kind**: instance method of <code>[StateManClass](#StateManClass)</code>  
-<a name="StateManClass.executeActions"></a>
-### StateManClass.executeActions(actions, haltForFalse, actionArgs) ⇒ <code>Boolean</code>
-Executes the actions with the specified arguments.
-
-**Kind**: static method of <code>[StateManClass](#StateManClass)</code>  
-**Returns**: <code>Boolean</code> - `true` if all actions are performed. `false` otherwise.  
-
-| Param | Type |
-| --- | --- |
-| actions | <code>Array.&lt;function()&gt;</code> | 
-| haltForFalse | <code>Boolean</code> | 
-| actionArgs | <code>Array.&lt;\*&gt;</code> | 
-
 <a name="StateManClass..stateBeforeLeaveCallback"></a>
 ### StateManClass~stateBeforeLeaveCallback ⇒ <code>Boolean</code>
 Callback to be executed before leaving a state.

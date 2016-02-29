@@ -81,6 +81,7 @@
 
   /**
    * Executes the actions with the specified arguments.
+   * @private
    * @function
    * @static
    * @param {Array.<Function>} actions
@@ -88,7 +89,7 @@
    * @param {Array.<*>} actionArgs
    * @returns {Boolean} `true` if all actions are performed. `false` otherwise.
    */
-  StateManClass.executeActions = function (actions, haltForFalse, actionArgs) {
+  StateManClass._executeActions = function (actions, haltForFalse, actionArgs) {
     if (!Array.isArray(actions)) {
       throw new TypeError('Expecting an array.');
     }
@@ -152,7 +153,7 @@
     var prevState = this._currentState;
 
     // Try to leave current state (prevState).
-    if (StateManClass.executeActions.call(
+    if (StateManClass._executeActions.call(
           this,
           this._actionsBeforeLeave[prevState] || emptyArray,
           true,
@@ -166,7 +167,7 @@
     // else
 
     // Try to enter new state (nextState).
-    if (StateManClass.executeActions.call(
+    if (StateManClass._executeActions.call(
           this,
           this._actionsBeforeEnter[nextState] || emptyArray,
           true,
@@ -185,20 +186,20 @@
     // Deactivate lock.
     this._stateLock = false;
 
-    setTimeout(StateManClass.executeActions.bind(
+    setTimeout(StateManClass._executeActions.bind(
                  this,
                  this._actionsAfterLeave[prevState] || emptyArray,
                  false,
                  [prevState, nextState, data]
                ), 0);
-    setTimeout(StateManClass.executeActions.bind(
+    setTimeout(StateManClass._executeActions.bind(
                  this,
                  this._actionsAfterEnter[nextState] || emptyArray,
                  false,
                  [prevState, nextState, data]
                ), 0);
 
-    setTimeout(StateManClass.executeActions.bind(
+    setTimeout(StateManClass._executeActions.bind(
                  this,
                  this._stateMonitors,
                  false,
