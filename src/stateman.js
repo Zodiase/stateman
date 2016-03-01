@@ -115,6 +115,32 @@
   };
 
   /**
+   * Run a sequence of functions with a given time interval.
+   * @private
+   * @function
+   * @static
+   * @param {Array.<Function>} funcs
+   * @param {Number} timeout
+   */
+  StateManClass._setTimeouts = function (funcs, timeout) {
+    if (funcs.length <= 0) {
+      return;
+    }
+
+    var wrap = function (funcs, timeout) {
+      var func = funcs.shift();
+      func();
+
+      if (funcs.length <= 0) {
+        return;
+      } else {
+        setTimeout(wrap.bind(null, funcs, timeout), timeout);
+      }
+    };
+    setTimeout(wrap.bind(null, funcs, timeout), timeout);
+  };
+
+  /**
    * Returns the current state.
    * @function
    * @returns {String} The current state.
@@ -186,29 +212,32 @@
     // Deactivate lock.
     this._stateLock = false;
 
-    setTimeout(StateManClass._executeActions.bind(
-                 this,
-                 this._actionsAfterLeave[prevState] || emptyArray,
-                 false,
-                 [prevState, nextState, data]
-               ), 0);
-    setTimeout(StateManClass._executeActions.bind(
-                 this,
-                 this._actionsAfterEnter[nextState] || emptyArray,
-                 false,
-                 [prevState, nextState, data]
-               ), 0);
-
-    setTimeout(StateManClass._executeActions.bind(
-                 this,
-                 this._stateMonitors,
-                 false,
-                 [nextState, prevState, data]
-               ), 0);
+    var actionsAfterSuccess = [
+      StateManClass._executeActions.bind(
+       this,
+       this._actionsAfterLeave[prevState] || emptyArray,
+       false,
+       [prevState, nextState, data]
+     ),
+     StateManClass._executeActions.bind(
+       this,
+       this._actionsAfterEnter[nextState] || emptyArray,
+       false,
+       [prevState, nextState, data]
+     ),
+     StateManClass._executeActions.bind(
+       this,
+       this._stateMonitors,
+       false,
+       [nextState, prevState, data]
+     )
+    ];
 
     if (typeof callback === 'function') {
-      setTimeout(callback.bind(this, data), 0);
+      actionsAfterSuccess.push(callback.bind(this, data));
     }
+
+    StateManClass._setTimeouts(actionsAfterSuccess, 0);
 
     return true;
   };
