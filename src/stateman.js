@@ -331,9 +331,11 @@
     return newStateMachine;
   };
 
-  if (module) {
-    module.exports = STATEMAN;
-  } else {
-    window.STATEMAN = STATEMAN;
-  }
+  (function tryExport () {
+    try {
+      module.exports = STATEMAN;
+    } catch(e) {
+      window.STATEMAN = STATEMAN;
+    }
+  })();
 })();
